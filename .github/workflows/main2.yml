@@ -1,0 +1,36 @@
+name: CxFlow
+on:
+  push:
+    branches: [ $default-branch, $protected-branches ]
+  pull_request:
+    branches: [ $default-branch ]
+jobs:
+  build:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      security-events: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkmarx CxFlow Action
+        uses: checkmarx-ts/checkmarx-cxflow-github-action@v2.3
+        with:
+          project: 'Github_Report'
+          team: 'CxServer'
+          checkmarx_url: 'https://172.16.7.172/'
+          checkmarx_username: 'admin@cx'
+          checkmarx_password: '1qaz@WSX#EDC'
+          scanners: sast
+          params: --namespace=${{ github.repository_owner }} --checkmarx.settings-override=true --repo-name=${{ github.event.repository.name }} --branch=${{ github.ref_name }}
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: cx.sarif
+
+      - name: Upload Checkmarx Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Report
+          path: cx.sarif 
