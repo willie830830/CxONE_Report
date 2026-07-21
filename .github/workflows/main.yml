@@ -2,8 +2,7 @@ name: Checkmarx Sarif Integration
 
 # Controls when the workflow will run
 on:
-  pull_request:
-    types: [opened, reopened, synchronize]
+  push:
     branches:
       - master
       - main
@@ -23,7 +22,7 @@ jobs:
       - name: Checkmarx scan
         uses: checkmarx/ast-github-action@main
         with:
-          base_uri: https://ast.checkmarx.net
+          base_uri: https://sng.ast.checkmarx.net
           cx_client_id: ${{ secrets.CX_CLIENT_ID }}
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
           cx_tenant: ${{ secrets.CX_TENANT }} # This should be replaced by users' tenant name
