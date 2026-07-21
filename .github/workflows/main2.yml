@@ -20,7 +20,7 @@ jobs:
         with:
           project: 'Github_Report'
           team: 'CxServer'
-          checkmarx_url: 'https://172.16.7.172/'
+          checkmarx_url: 'https://172.16.7.172'
           checkmarx_username: 'admin@cx'
           checkmarx_password: '1qaz@WSX#EDC'
           scanners: sast
