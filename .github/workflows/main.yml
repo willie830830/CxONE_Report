@@ -26,9 +26,13 @@ jobs:
           cx_client_id: ${{ secrets.CX_CLIENT_ID }}
           cx_client_secret: ${{ secrets.CX_CLIENT_SECRET }}
           cx_tenant: ${{ secrets.CX_TENANT }} # This should be replaced by users' tenant name
-          additional_params: --report-format sarif --output-path .
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v1
+          project_name: 'GSS_Willie_Test'
+          # Branch name
+          branch: 'github_report'
+          additional_params: --report-format sarif --output-path . --output-name SARIF_REPORT
+
+      - name: Upload Checkmarx Report as Artifact
+        uses: actions/upload-artifact@v4
         with:
-          # Path to SARIF file relative to the root of the repository
-          sarif_file: cx_result.sarif
+          name: Report
+          path: SARIF_REPORT.sarif
