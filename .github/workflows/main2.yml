@@ -1,10 +1,10 @@
 name: CxFlow
-# Controls when the workflow will run
 on:
   push:
     branches:
       - master
       - main
+
 jobs:
   build:
     runs-on: self-hosted
@@ -13,18 +13,36 @@ jobs:
       issues: write
       pull-requests: write
       security-events: write
+
     steps:
       - uses: actions/checkout@v3
-      - name: Checkmarx CxFlow Action
-        uses: checkmarx-ts/checkmarx-cxflow-github-action@v2.3
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
-          project: 'Github_Report'
-          team: 'CxServer'
-          checkmarx_url: 'https://172.16.7.172'
-          checkmarx_username: 'admin@cx'
-          checkmarx_password: '1qaz@WSX#EDC'
-          scanners: sast
-          params: --namespace=${{ github.repository_owner }} --checkmarx.settings-override=true --repo-name=${{ github.event.repository.name }} --branch=${{ github.ref_name }}
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run CxFlow Scan
+        shell: pwsh
+        env:
+          CHECKMARX_USERNAME: ${{ secrets.CHECKMARX_USERNAME }}
+          CHECKMARX_PASSWORD: ${{ secrets.CHECKMARX_PASSWORD }}
+        run: |
+          java -jar C:\CxFlow\cx-flow-1.7.09.jar `
+            --scan `
+            --f="." `
+            --project="Github_Report" `
+            --checkmarx.team="CxServer" `
+            --checkmarx.username="$env:CHECKMARX_USERNAME" `
+            --checkmarx.password="$env:CHECKMARX_PASSWORD" `
+            --cx-flow.enabled-vulnerability-scanners=sast `
+            --cx-flow.bug-tracker=GITHUBPULL `
+            --namespace=${{ github.repository_owner }} `
+            --repo-name=${{ github.event.repository.name }} `
+            --branch=${{ github.ref_name }} `
+            --checkmarx.settings-override=true
+
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v2
         with:
@@ -34,4 +52,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Report
-          path: cx.sarif 
+          path: cx.sarif
